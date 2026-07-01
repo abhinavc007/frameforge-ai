@@ -10,6 +10,8 @@ type Shot = {
   cameraAngle: string;
   description: string;
   visualPrompt: string;
+  negativePrompt?: string;
+  styleNotes?: string;
 };
 
 type Scene = {
@@ -30,6 +32,9 @@ type GeneratedProject = {
   panelCount: number;
   scenes: Scene[];
 };
+
+const defaultNegativePrompt =
+  "blurry, low quality, distorted face, bad anatomy, extra limbs, extra fingers, messy hands, unreadable text, watermark, logo, random letters, photorealistic, ugly composition, cropped subject";
 
 const fallbackProject: GeneratedProject = {
   projectTitle: "The Last Lantern",
@@ -53,6 +58,8 @@ const fallbackProject: GeneratedProject = {
           description: "Wide shot of the empty rainy village road.",
           visualPrompt:
             "Cinematic anime storyboard panel, rainy village road, dramatic lighting.",
+          negativePrompt: defaultNegativePrompt,
+          styleNotes: "Cinematic anime storyboard style with dramatic mood.",
         },
         {
           shotNumber: 2,
@@ -60,6 +67,8 @@ const fallbackProject: GeneratedProject = {
           description: "Medium shot of the boy walking under a broken umbrella.",
           visualPrompt:
             "Cinematic anime storyboard panel, boy under umbrella, rainy atmosphere.",
+          negativePrompt: defaultNegativePrompt,
+          styleNotes: "Cinematic anime storyboard style with dramatic mood.",
         },
         {
           shotNumber: 3,
@@ -67,6 +76,8 @@ const fallbackProject: GeneratedProject = {
           description: "Close-up of the boy’s tired eyes as thunder flashes.",
           visualPrompt:
             "Cinematic anime storyboard panel, close-up emotional face, thunder light.",
+          negativePrompt: defaultNegativePrompt,
+          styleNotes: "Cinematic anime storyboard style with dramatic mood.",
         },
         {
           shotNumber: 4,
@@ -74,6 +85,8 @@ const fallbackProject: GeneratedProject = {
           description: "Low-angle shot of the lantern flickering near the shrine.",
           visualPrompt:
             "Cinematic anime storyboard panel, glowing lantern near old shrine.",
+          negativePrompt: defaultNegativePrompt,
+          styleNotes: "Cinematic anime storyboard style with dramatic mood.",
         },
       ],
     },
@@ -194,6 +207,26 @@ export default function DemoProjectPage() {
                         {shot.visualPrompt}
                       </p>
                     </div>
+
+                    <div className="mt-3 rounded-2xl border border-red-400/10 bg-red-500/5 p-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-200/50">
+                        Negative Prompt
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-white/40">
+                        {shot.negativePrompt || defaultNegativePrompt}
+                      </p>
+                    </div>
+
+                    {shot.styleNotes ? (
+                      <div className="mt-3 rounded-2xl border border-purple-400/10 bg-purple-500/5 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-purple-200/50">
+                          Style Notes
+                        </p>
+                        <p className="mt-2 text-xs leading-5 text-white/40">
+                          {shot.styleNotes}
+                        </p>
+                      </div>
+                    ) : null}
 
                     <button className="mt-5 w-full rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white/70 transition hover:text-white">
                       Regenerate Panel

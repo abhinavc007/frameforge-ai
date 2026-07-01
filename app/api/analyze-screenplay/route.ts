@@ -56,35 +56,67 @@ function getStoryBeats(sceneSummary: string) {
   };
 }
 
+function createStoryboardPrompt({
+  style,
+  cameraAngle,
+  storyBeat,
+  mood,
+}: {
+  style: string;
+  cameraAngle: string;
+  storyBeat: string;
+  mood: string;
+}) {
+  return `${style} anime-style cinematic storyboard panel, ${cameraAngle.toLowerCase()}, ${storyBeat}, ${mood}, expressive character acting, strong visual composition, clean anime linework, dramatic lighting, detailed environment, film storyboard framing, professional concept art quality, no text inside image`;
+}
+
+function createNegativePrompt() {
+  return "blurry, low quality, distorted face, bad anatomy, extra limbs, extra fingers, messy hands, unreadable text, watermark, logo, random letters, photorealistic, ugly composition, cropped subject";
+}
+
 function createShotList(sceneSummary: string, style: string, mood: string) {
   const beats = getStoryBeats(sceneSummary);
 
-  return [
+  const shots = [
     {
       shotNumber: 1,
       cameraAngle: "Wide establishing shot",
       description: `Establish the scene environment and atmosphere: ${beats.openingBeat}`,
-      visualPrompt: `${style} storyboard panel, wide establishing shot, ${beats.openingBeat}, ${mood}, cinematic composition, atmospheric background, strong lighting`,
+      storyBeat: beats.openingBeat,
     },
     {
       shotNumber: 2,
       cameraAngle: "Medium action shot",
       description: `Show the main action or character movement: ${beats.actionBeat}`,
-      visualPrompt: `${style} storyboard panel, medium action shot, ${beats.actionBeat}, expressive character pose, anime-style cinematic framing`,
+      storyBeat: beats.actionBeat,
     },
     {
       shotNumber: 3,
       cameraAngle: "Close-up detail shot",
       description: `Focus on an important emotion, object, or visual detail: ${beats.detailBeat}`,
-      visualPrompt: `${style} storyboard panel, close-up detail shot, ${beats.detailBeat}, emotional focus, dramatic anime lighting`,
+      storyBeat: beats.detailBeat,
     },
     {
       shotNumber: 4,
       cameraAngle: "Final transition shot",
       description: `End the scene with a strong visual beat: ${beats.finalBeat}`,
-      visualPrompt: `${style} storyboard panel, final transition shot, ${beats.finalBeat}, cinematic ending frame, ${mood}, strong visual atmosphere`,
+      storyBeat: beats.finalBeat,
     },
   ];
+
+  return shots.map((shot) => ({
+    shotNumber: shot.shotNumber,
+    cameraAngle: shot.cameraAngle,
+    description: shot.description,
+    visualPrompt: createStoryboardPrompt({
+      style,
+      cameraAngle: shot.cameraAngle,
+      storyBeat: shot.storyBeat,
+      mood,
+    }),
+    negativePrompt: createNegativePrompt(),
+    styleNotes: `${style} storyboard style with ${mood.toLowerCase()} mood.`,
+  }));
 }
 
 function cleanSceneHeading(heading: string) {
