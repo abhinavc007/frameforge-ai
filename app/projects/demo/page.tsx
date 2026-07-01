@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import GradientBackground from "@/components/GradientBackground";
+import AppNavbar from "@/components/AppNavbar";
 
 type ProjectDraft = {
   title: string;
@@ -60,26 +60,12 @@ const projectStyle = projectDraft?.style || "Cinematic anime";
     <main className="min-h-screen bg-black text-white">
       <GradientBackground />
       <div className="mx-auto max-w-7xl px-6 py-6">
-        <nav className="flex items-center justify-between border-b border-white/10 pb-6">
-          <Link href="/" className="text-xl font-bold tracking-tight">
-            FrameForge <span className="text-purple-400">AI</span>
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard"
-              className="rounded-full border border-white/15 px-5 py-2 text-sm text-white/70 transition hover:text-white"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/projects/new"
-              className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition hover:bg-white/90"
-            >
-              New Project
-            </Link>
-          </div>
-        </nav>
+        <AppNavbar
+  secondaryHref="/dashboard"
+  secondaryLabel="Dashboard"
+  ctaHref="/projects/new"
+  ctaLabel="New Project"
+/>
 
         <section className="py-12">
           <motion.div

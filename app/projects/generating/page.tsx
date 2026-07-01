@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import GradientBackground from "@/components/GradientBackground";
+import AppNavbar from "@/components/AppNavbar";
 
 const generationSteps = [
   "Reading screenplay structure",
@@ -62,18 +62,10 @@ export default function GeneratingPage() {
     <main className="min-h-screen bg-black text-white">
       <GradientBackground />
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-6 py-6">
-        <nav className="flex items-center justify-between border-b border-white/10 pb-6">
-          <Link href="/" className="text-xl font-bold tracking-tight">
-            FrameForge <span className="text-purple-400">AI</span>
-          </Link>
-
-          <Link
-            href="/dashboard"
-            className="rounded-full border border-white/15 px-5 py-2 text-sm text-white/70 transition hover:text-white"
-          >
-            Dashboard
-          </Link>
-        </nav>
+        <AppNavbar
+  secondaryHref="/dashboard"
+  secondaryLabel="Dashboard"
+/>
 
         <section className="flex flex-1 items-center justify-center py-16">
           <motion.div

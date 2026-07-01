@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import GradientBackground from "@/components/GradientBackground";
+import AppNavbar from "@/components/AppNavbar";
+
 const styleOptions = [
   "Cinematic anime",
   "Dark fantasy",
@@ -30,25 +32,10 @@ export default function CreateProjectPage() {
     <main className="min-h-screen bg-black text-white">
       <GradientBackground />
       <div className="mx-auto max-w-7xl px-6 py-6">
-        <motion.nav
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex items-center justify-between border-b border-white/10 pb-6"
-        >
-          <Link href="/" className="text-xl font-bold tracking-tight">
-            FrameForge <span className="text-purple-400">AI</span>
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard"
-              className="rounded-full border border-white/15 px-5 py-2 text-sm text-white/70 transition hover:text-white"
-            >
-              Dashboard
-            </Link>
-          </div>
-        </motion.nav>
+        <AppNavbar
+  secondaryHref="/dashboard"
+  secondaryLabel="Dashboard"
+/>
 
         <section className="py-12">
           <motion.div
