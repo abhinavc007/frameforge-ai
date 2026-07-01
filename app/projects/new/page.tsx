@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
 
@@ -13,6 +14,7 @@ const styleOptions = [
 ];
 
 export default function CreateProjectPage() {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [screenplay, setScreenplay] = useState("");
   const [style, setStyle] = useState("Cinematic anime");
@@ -156,16 +158,34 @@ export default function CreateProjectPage() {
                   </Link>
 
                   <button
-                    type="button"
-                    disabled={!canGenerate}
-                    className={`rounded-full px-8 py-4 font-semibold transition ${
-                      canGenerate
-                        ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-[1.03]"
-                        : "cursor-not-allowed bg-white/10 text-white/35"
-                    }`}
-                  >
-                    Generate Storyboard
-                  </button>
+  type="button"
+  disabled={!canGenerate}
+  onClick={() => {
+  if (canGenerate) {
+    const projectDraft = {
+      title: title.trim(),
+      screenplay: screenplay.trim(),
+      style,
+      characterNotes: characterNotes.trim(),
+      createdAt: new Date().toISOString(),
+    };
+
+    sessionStorage.setItem(
+      "frameforge-current-project",
+      JSON.stringify(projectDraft)
+    );
+
+    router.push("/projects/demo");
+  }
+}}
+  className={`rounded-full px-8 py-4 font-semibold transition ${
+    canGenerate
+      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-[1.03]"
+      : "cursor-not-allowed bg-white/10 text-white/35"
+  }`}
+>
+  Generate Storyboard
+</button>
                 </div>
               </div>
             </motion.form>

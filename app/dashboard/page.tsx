@@ -228,9 +228,9 @@ export default function DashboardPage() {
                   <p className="text-xs text-white/40">
                     Updated {project.updated}
                   </p>
-                  <button className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white/75 transition hover:text-white">
+                  <Link href="/projects/demo" className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white/75 transition hover:text-white">
                     Open
-                  </button>
+                  </Link>
                 </div>
               </motion.article>
             ))}
