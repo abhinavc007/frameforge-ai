@@ -1,36 +1,118 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FrameForge AI
 
-## Getting Started
+FrameForge AI is an AI-powered storyboard generation platform that converts a written screenplay or story scene into structured anime-style storyboard panels.
 
-First, run the development server:
+It allows users to enter a story, choose a visual style, add character or world notes, and generate cinematic storyboard panels using AI.
+
+## Overview
+
+FrameForge AI is designed for writers, anime creators, students, storytellers, and creative beginners who want to visualize their story ideas before production.
+
+The project demonstrates a complete creative AI workflow:
+
+```text
+Story input → Scene analysis → Shot planning → Storyboard captions → AI image generation
+```
+
+## Features
+
+- Premium animated landing page
+- Creator dashboard
+- New project creation flow
+- Animated storyboard cube intro
+- Screenplay/story input form
+- Visual style selection
+- Character and world notes support
+- AI screenplay analysis
+- Scene extraction
+- Dynamic shot planning
+- Cinematic storyboard captions
+- AI-generated anime storyboard panels
+- Image persistence using browser session storage
+- Polished storyboard result page
+- Responsive dark UI
+- Smooth animations using Framer Motion
+
+## Tech Stack
+
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- Pollinations AI
+- Browser Session Storage
+- Browser Local Storage
+
+## How It Works
+
+1. The user enters a project title, screenplay, visual style, and optional character notes.
+2. The screenplay is analyzed and divided into scenes.
+3. Each scene is converted into cinematic storyboard shots.
+4. Each shot gets a readable caption and a hidden AI visual prompt.
+5. The user generates anime-style storyboard panels.
+6. Generated panels are displayed and saved during the browser session.
+
+## Main Pages
+
+- Landing Page
+- Dashboard
+- Create New Project
+- Generating Screen
+- Storyboard Result Page
+
+## Environment Variables
+
+Create a `.env.local` file in the root directory and add:
+
+```env
+POLLINATIONS_KEY=your_api_key_here
+```
+
+Do not push `.env.local` to GitHub.
+
+## Run Locally
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Build
 
-## Learn More
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Project Status
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+FrameForge AI is currently an MVP built for portfolio and learning purposes.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+It focuses on demonstrating a real AI-powered creative workflow, polished UI design, animation, and practical storyboard generation from text input.
 
-## Deploy on Vercel
+## Future Improvements
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Real user authentication
+- Database-backed project history
+- Export storyboard as PDF
+- Character reference image support
+- Cloud image storage
+- Better dashboard project management
+- Public sharing links
+- Advanced storyboard editing tools
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Author
+
+Built by Abhinav C.
