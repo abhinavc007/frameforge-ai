@@ -1,9 +1,29 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 export default function Home() {
+  const previewShots = [
+    {
+      image: "/landing/shot1.png",
+      label: "Shot 1: prophecy discovered",
+    },
+    {
+      image: "/landing/shot2.png",
+      label: "Shot 2: intense character beat",
+    },
+    {
+      image: "/landing/shot3.png",
+      label: "Shot 3: action sequence",
+    },
+    {
+      image: "/landing/shot4.png",
+      label: "Shot 4: cinematic reveal",
+    },
+  ];
+
   const steps = [
     {
       title: "Paste your screenplay",
@@ -22,21 +42,25 @@ export default function Home() {
   const features = [
     {
       title: "Scene Breakdown",
+      image: "/landing/shot1.png",
       description:
         "Intelligently parse your screenplay into structured scenes and beats. Our AI identifies key narrative moments and visual cues to create a solid foundation for storyboarding.",
     },
     {
       title: "Shot Generation",
+      image: "/landing/shot2.png",
       description:
         "Transform scenes into cinematic shot descriptions with camera angles, movements, and timing. Each shot is optimized for anime composition and visual impact.",
     },
     {
       title: "Anime Storyboard Panels",
+      image: "/landing/shot3.png",
       description:
         "Generate anime-style visual panels from shot descriptions. Our AI creates expressive character work, dynamic compositions, and atmospheric backgrounds instantly.",
     },
     {
       title: "Regenerate Frames",
+      image: "/landing/shot4.png",
       description:
         "Iterate freely on any panel with one click. Refine compositions, adjust character expressions, or explore alternative visual directions without restarting your workflow.",
     },
@@ -62,8 +86,12 @@ export default function Home() {
               <button className="hidden rounded-full border border-white/15 px-5 py-2 text-sm text-white/80 sm:block">
                 Sign In
               </button>
-              <Link href="/dashboard" className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black">
-                 Start Creating
+
+              <Link
+                href="/dashboard"
+                className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black"
+              >
+                Start Creating
               </Link>
             </div>
           </motion.nav>
@@ -73,7 +101,11 @@ export default function Home() {
               <motion.p
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                transition={{
+                  duration: 0.6,
+                  delay: 0.1,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
                 className="mb-5 inline-flex rounded-full border border-purple-400/30 bg-purple-400/10 px-4 py-2 text-sm text-purple-200"
               >
                 AI storyboard studio for anime creators
@@ -82,7 +114,11 @@ export default function Home() {
               <motion.h2
                 initial={{ opacity: 0, y: 22 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                transition={{
+                  duration: 0.7,
+                  delay: 0.2,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
                 className="max-w-3xl text-4xl font-black leading-[1.04] tracking-tight md:text-5xl xl:text-6xl"
               >
                 Turn Screenplays into{" "}
@@ -94,7 +130,11 @@ export default function Home() {
               <motion.p
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                transition={{
+                  duration: 0.6,
+                  delay: 0.32,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
                 className="mt-6 max-w-2xl text-lg leading-8 text-white/65"
               >
                 Paste a screenplay and generate scene breakdowns, cinematic
@@ -104,23 +144,37 @@ export default function Home() {
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.44, ease: [0.22, 1, 0.36, 1] }}
+                transition={{
+                  duration: 0.6,
+                  delay: 0.44,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
                 className="mt-9 flex flex-col gap-4 sm:flex-row"
               >
                 <Link
-                href="/dashboard" className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-10 py-4 text-center text-lg font-semibold transition-transform duration-300 hover:scale-[1.05]">
-                Start Creating
+                  href="/dashboard"
+                  className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-10 py-4 text-center text-lg font-semibold transition-transform duration-300 hover:scale-[1.05]"
+                >
+                  Start Creating
                 </Link>
-                <button className="rounded-full border border-white/15 px-8 py-4 font-semibold text-white/80 transition-transform duration-300 hover:scale-[1.03]">
+
+                <Link
+                  href="/projects/demo"
+                  className="rounded-full border border-white/15 px-8 py-4 text-center font-semibold text-white/80 transition-transform duration-300 hover:scale-[1.03]"
+                >
                   View Demo
-                </button>
+                </Link>
               </motion.div>
             </div>
 
             <motion.div
               initial={{ opacity: 0, y: 30, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              transition={{
+                duration: 0.8,
+                delay: 0.3,
+                ease: [0.22, 1, 0.36, 1],
+              }}
             >
               <motion.div
                 animate={{ y: [0, -8, 0] }}
@@ -152,25 +206,37 @@ export default function Home() {
                     },
                   }}
                 >
-                  {[1, 2, 3, 4].map((item) => (
+                  {previewShots.map((shot) => (
                     <motion.div
-                      key={item}
+                      key={shot.label}
                       variants={{
                         hidden: { opacity: 0, y: 14, scale: 0.96 },
                         visible: {
                           opacity: 1,
                           y: 0,
                           scale: 1,
-                          transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+                          transition: {
+                            duration: 0.5,
+                            ease: [0.22, 1, 0.36, 1],
+                          },
                         },
                       }}
-                      className="aspect-[4/3] rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900 to-purple-950 p-4"
+                      className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]"
                     >
-                      <div className="mb-3 h-3 w-20 rounded-full bg-white/20" />
-                      <div className="flex h-full items-end">
-                        <p className="text-xs text-white/55">
-                          Shot {item}: cinematic anime frame
-                        </p>
+                      <div className="relative aspect-[4/3] overflow-hidden">
+                        <Image
+                          src={shot.image}
+                          alt={shot.label}
+                          fill
+                          sizes="(max-width: 768px) 45vw, 300px"
+                          className="object-cover"
+                          priority
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+                      </div>
+
+                      <div className="border-t border-white/10 bg-black/45 px-4 py-3">
+                        <p className="text-xs text-white/65">{shot.label}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -276,13 +342,25 @@ export default function Home() {
                 },
               }}
               whileHover={{ y: -4 }}
-              className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03] p-6"
+              className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03]"
             >
-              <div className="mb-8 h-28 rounded-2xl bg-gradient-to-br from-purple-500/20 via-pink-500/10 to-blue-500/20" />
-              <h4 className="text-lg font-semibold">{feature.title}</h4>
-              <p className="mt-3 text-sm leading-6 text-white/50">
-                {feature.description}
-              </p>
+              <div className="relative h-36 overflow-hidden">
+                <Image
+                  src={feature.image}
+                  alt={feature.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 25vw"
+                  className="object-cover opacity-90"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+              </div>
+
+              <div className="p-6">
+                <h4 className="text-lg font-semibold">{feature.title}</h4>
+                <p className="mt-3 text-sm leading-6 text-white/50">
+                  {feature.description}
+                </p>
+              </div>
             </motion.div>
           ))}
         </motion.div>
@@ -302,10 +380,10 @@ export default function Home() {
               Ready to forge your first storyboard?
             </h3>
             <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-white/65">
-                 Transform your screenplay into structured anime-style storyboard
-                 panels — from written scenes to visual planning in minutes.
+              Transform your screenplay into structured anime-style storyboard
+              panels — from written scenes to visual planning in minutes.
             </p>
-      
+
             <motion.div
               className="mt-10 flex justify-center"
               initial={{ opacity: 0 }}
@@ -313,7 +391,10 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ delay: 0.3, duration: 0.6 }}
             >
-              <Link href="/dashboard" className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-10 py-4 text-lg font-semibold transition-transform duration-300 hover:scale-[1.05]">
+              <Link
+                href="/dashboard"
+                className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-10 py-4 text-lg font-semibold transition-transform duration-300 hover:scale-[1.05]"
+              >
                 Start Creating
               </Link>
             </motion.div>
@@ -322,84 +403,84 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-white/10 px-6 py-12">
-  <div className="mx-auto max-w-7xl">
-    <div className="mb-12 grid gap-10 md:grid-cols-3">
-      <div>
-        <h4 className="text-lg font-bold">
-          FrameForge <span className="text-purple-400">AI</span>
-        </h4>
-        <p className="mt-3 max-w-sm text-sm leading-6 text-white/50">
-          AI-powered storyboarding tool for anime creators. Turn screenplays
-          into structured visual storyboard panels.
-        </p>
-      </div>
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 grid gap-10 md:grid-cols-3">
+            <div>
+              <h4 className="text-lg font-bold">
+                FrameForge <span className="text-purple-400">AI</span>
+              </h4>
+              <p className="mt-3 max-w-sm text-sm leading-6 text-white/50">
+                AI-powered storyboarding tool for anime creators. Turn
+                screenplays into structured visual storyboard panels.
+              </p>
+            </div>
 
-      <div>
-        <h5 className="text-sm font-semibold text-white/80">Product</h5>
-        <ul className="mt-4 space-y-3">
-          <li>
-            <a
-              href="#"
-              className="text-sm text-white/50 transition-colors hover:text-white/80"
-            >
-              Features
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="text-sm text-white/50 transition-colors hover:text-white/80"
-            >
-              Workflow
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="text-sm text-white/50 transition-colors hover:text-white/80"
-            >
-              Demo
-            </a>
-          </li>
-        </ul>
-      </div>
+            <div>
+              <h5 className="text-sm font-semibold text-white/80">Product</h5>
+              <ul className="mt-4 space-y-3">
+                <li>
+                  <a
+                    href="#"
+                    className="text-sm text-white/50 transition-colors hover:text-white/80"
+                  >
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-sm text-white/50 transition-colors hover:text-white/80"
+                  >
+                    Workflow
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-sm text-white/50 transition-colors hover:text-white/80"
+                  >
+                    Demo
+                  </a>
+                </li>
+              </ul>
+            </div>
 
-      <div>
-        <h5 className="text-sm font-semibold text-white/80">Company</h5>
-        <ul className="mt-4 space-y-3">
-          <li>
-            <a
-              href="#"
-              className="text-sm text-white/50 transition-colors hover:text-white/80"
-            >
-              GitHub
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="text-sm text-white/50 transition-colors hover:text-white/80"
-            >
-              Contact
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="text-sm text-white/50 transition-colors hover:text-white/80"
-            >
-              Roadmap
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
+            <div>
+              <h5 className="text-sm font-semibold text-white/80">Company</h5>
+              <ul className="mt-4 space-y-3">
+                <li>
+                  <a
+                    href="#"
+                    className="text-sm text-white/50 transition-colors hover:text-white/80"
+                  >
+                    GitHub
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-sm text-white/50 transition-colors hover:text-white/80"
+                  >
+                    Contact
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-sm text-white/50 transition-colors hover:text-white/80"
+                  >
+                    Roadmap
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
 
-    <div className="border-t border-white/10 pt-8 text-center text-sm text-white/40">
-      <p>© 2026 FrameForge AI. All rights reserved.</p>
-    </div>
-  </div>
-</footer>
+          <div className="border-t border-white/10 pt-8 text-center text-sm text-white/40">
+            <p>© 2026 FrameForge AI. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
