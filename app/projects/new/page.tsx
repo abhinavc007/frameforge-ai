@@ -175,7 +175,7 @@ export default function CreateProjectPage() {
       JSON.stringify(projectDraft)
     );
 
-    router.push("/projects/demo");
+    router.push("/projects/generating");
   }
 }}
   className={`rounded-full px-8 py-4 font-semibold transition ${
