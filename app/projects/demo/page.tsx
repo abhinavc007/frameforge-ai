@@ -9,6 +9,7 @@ type Shot = {
   shotNumber: number;
   cameraAngle: string;
   description: string;
+  caption?: string;
   visualPrompt: string;
   negativePrompt?: string;
   styleNotes?: string;
@@ -56,6 +57,8 @@ const fallbackProject: GeneratedProject = {
           shotNumber: 1,
           cameraAngle: "Wide establishing shot",
           description: "Wide shot of the empty rainy village road.",
+          caption:
+            "A young boy walks alone through the empty rainy village road.",
           visualPrompt:
             "Cinematic anime storyboard panel, rainy village road, dramatic lighting.",
           negativePrompt: defaultNegativePrompt,
@@ -65,6 +68,8 @@ const fallbackProject: GeneratedProject = {
           shotNumber: 2,
           cameraAngle: "Medium character shot",
           description: "Medium shot of the boy walking under a broken umbrella.",
+          caption:
+            "The boy walks forward under a broken umbrella as rain falls around him.",
           visualPrompt:
             "Cinematic anime storyboard panel, boy under umbrella, rainy atmosphere.",
           negativePrompt: defaultNegativePrompt,
@@ -74,6 +79,8 @@ const fallbackProject: GeneratedProject = {
           shotNumber: 3,
           cameraAngle: "Close-up emotional shot",
           description: "Close-up of the boy’s tired eyes as thunder flashes.",
+          caption:
+            "Thunder flashes across the sky as the boy’s tired eyes reveal his fear.",
           visualPrompt:
             "Cinematic anime storyboard panel, close-up emotional face, thunder light.",
           negativePrompt: defaultNegativePrompt,
@@ -83,6 +90,8 @@ const fallbackProject: GeneratedProject = {
           shotNumber: 4,
           cameraAngle: "Final transition shot",
           description: "Low-angle shot of the lantern flickering near the shrine.",
+          caption:
+            "A distant lantern flickers near the abandoned shrine, pulling him forward.",
           visualPrompt:
             "Cinematic anime storyboard panel, glowing lantern near old shrine.",
           negativePrompt: defaultNegativePrompt,
@@ -95,6 +104,10 @@ const fallbackProject: GeneratedProject = {
 
 export default function DemoProjectPage() {
   const [project, setProject] = useState<GeneratedProject>(fallbackProject);
+  const [generatedImages, setGeneratedImages] = useState<Record<string, string>>(
+    {}
+  );
+  const [generatingPanelKey, setGeneratingPanelKey] = useState("");
 
   useEffect(() => {
     const savedGeneratedProject = sessionStorage.getItem(
@@ -105,6 +118,52 @@ export default function DemoProjectPage() {
       setProject(JSON.parse(savedGeneratedProject));
     }
   }, []);
+
+  async function generatePanelImage(sceneNumber: number, shot: Shot) {
+    const panelKey = `${sceneNumber}-${shot.shotNumber}`;
+
+    try {
+      setGeneratingPanelKey(panelKey);
+
+      const response = await fetch("/api/generate-panel", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          visualPrompt: shot.visualPrompt,
+          negativePrompt: shot.negativePrompt || defaultNegativePrompt,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Image generation failed.");
+      }
+
+      const data = await response.json();
+
+      setGeneratedImages((currentImages) => ({
+        ...currentImages,
+        [panelKey]: data.imageUrl,
+      }));
+    } catch {
+      alert("Failed to generate panel image. Please try again.");
+    } finally {
+      setGeneratingPanelKey("");
+    }
+  }
+
+  const storyboardPanels = project.scenes.flatMap((scene) =>
+    scene.shots.map((shot) => ({
+      sceneNumber: scene.sceneNumber,
+      shot,
+    }))
+  );
+
+  const gridClass =
+    storyboardPanels.length <= 2
+      ? "mx-auto grid max-w-4xl gap-8 md:grid-cols-2"
+      : "grid gap-8 md:grid-cols-2 xl:grid-cols-4";
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -123,119 +182,76 @@ export default function DemoProjectPage() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            className="text-center"
           >
-            <p className="mb-4 inline-flex rounded-full border border-green-400/30 bg-green-400/10 px-4 py-2 text-sm text-green-200">
-              Storyboard Generated
+            <p className="mx-auto mb-5 w-fit rounded-full border border-purple-400/20 bg-purple-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-purple-200/80">
+              Storyboard Preview
             </p>
 
-            <h1 className="max-w-4xl text-4xl font-black tracking-tight md:text-5xl">
+            <h1 className="text-5xl font-black tracking-tight md:text-7xl">
               {project.projectTitle}
             </h1>
-
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-white/60">
-              AI-generated scene breakdown, cinematic shot list, and{" "}
-              {project.style.toLowerCase()} storyboard panel preview.
-            </p>
           </motion.div>
-
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {[
-              { label: "Scenes", value: project.sceneCount },
-              { label: "Shots", value: project.shotCount },
-              { label: "Panels", value: project.panelCount },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-3xl border border-white/10 bg-white/[0.04] p-6"
-              >
-                <p className="text-sm text-white/50">{stat.label}</p>
-                <p className="mt-4 text-4xl font-black">{stat.value}</p>
-              </div>
-            ))}
-          </div>
         </section>
 
-        <section className="space-y-8 pb-20">
-          {project.scenes.map((scene) => (
-            <motion.article
-              key={`${scene.sceneNumber}-${scene.title}`}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6 }}
-              className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 md:p-8"
-            >
-              <div className="mb-8">
-                <p className="mb-3 text-sm text-purple-300">
-                  {scene.location} • {scene.timeOfDay} • {scene.mood}
-                </p>
+        <section className="pb-24">
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 shadow-2xl shadow-black/40 md:p-8">
+            <div className={gridClass}>
+              {storyboardPanels.map(({ sceneNumber, shot }, index) => {
+                const panelKey = `${sceneNumber}-${shot.shotNumber}`;
+                const imageUrl = generatedImages[panelKey];
+                const isGenerating = generatingPanelKey === panelKey;
 
-                <h2 className="text-2xl font-bold">{scene.title}</h2>
-
-                <p className="mt-4 max-w-3xl leading-7 text-white/55">
-                  {scene.summary}
-                </p>
-              </div>
-
-              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-                {scene.shots.map((shot) => (
-                  <div
-                    key={`${scene.sceneNumber}-${shot.shotNumber}`}
-                    className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03] p-4"
+                return (
+                  <motion.article
+                    key={panelKey}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{ duration: 0.5, delay: index * 0.04 }}
+                    className="rounded-[1.75rem] border border-white/10 bg-[#111111]/90 p-4 shadow-xl shadow-black/30"
                   >
-                    <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-purple-500/20 via-pink-500/10 to-blue-500/20 p-4">
-                      <div className="flex h-full items-end rounded-xl bg-black/25 p-3">
-                        <p className="text-xs text-white/45">
-                          Panel {scene.sceneNumber}.{shot.shotNumber}
-                        </p>
+                    <div className="overflow-hidden rounded-[1.25rem] border border-white/15 bg-neutral-900">
+                      <div className="aspect-[4/3] bg-gradient-to-br from-purple-500/20 via-pink-500/10 to-blue-500/20">
+                        {imageUrl ? (
+                          <img
+                            src={imageUrl}
+                            alt={`Generated panel ${sceneNumber}.${shot.shotNumber}`}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center p-6 text-center">
+                            <p className="text-sm leading-6 text-white/45">
+                              Generate this panel to preview the storyboard
+                              image.
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-purple-300/80">
-                      {shot.cameraAngle}
-                    </p>
-
-                    <p className="mt-3 text-sm leading-6 text-white/65">
-                      {shot.description}
-                    </p>
-
-                    <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/35">
-                        Visual Prompt
-                      </p>
-                      <p className="mt-2 text-xs leading-5 text-white/45">
-                        {shot.visualPrompt}
+                    <div className="mt-4 rounded-[1.15rem] border border-black/10 bg-[#f4efe3] p-4 text-black shadow-lg shadow-black/20">
+                      <p className="text-[15px] font-medium leading-7">
+                        {shot.caption || shot.description}
                       </p>
                     </div>
 
-                    <div className="mt-3 rounded-2xl border border-red-400/10 bg-red-500/5 p-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-200/50">
-                        Negative Prompt
-                      </p>
-                      <p className="mt-2 text-xs leading-5 text-white/40">
-                        {shot.negativePrompt || defaultNegativePrompt}
-                      </p>
-                    </div>
-
-                    {shot.styleNotes ? (
-                      <div className="mt-3 rounded-2xl border border-purple-400/10 bg-purple-500/5 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-purple-200/50">
-                          Style Notes
-                        </p>
-                        <p className="mt-2 text-xs leading-5 text-white/40">
-                          {shot.styleNotes}
-                        </p>
-                      </div>
-                    ) : null}
-
-                    <button className="mt-5 w-full rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white/70 transition hover:text-white">
-                      Regenerate Panel
+                    <button
+                      onClick={() => generatePanelImage(sceneNumber, shot)}
+                      disabled={isGenerating}
+                      className="mt-5 w-full rounded-full border border-white/15 bg-white px-4 py-3 text-sm font-bold text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {isGenerating
+                        ? "Generating..."
+                        : imageUrl
+                          ? "Regenerate Panel"
+                          : "Generate Panel"}
                     </button>
-                  </div>
-                ))}
-              </div>
-            </motion.article>
-          ))}
+                  </motion.article>
+                );
+              })}
+            </div>
+          </div>
         </section>
       </div>
     </main>
