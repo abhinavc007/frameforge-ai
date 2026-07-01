@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
-
+import GradientBackground from "@/components/GradientBackground";
 const styleOptions = [
   "Cinematic anime",
   "Dark fantasy",
@@ -28,8 +28,7 @@ export default function CreateProjectPage() {
 
   return (
     <main className="min-h-screen bg-black text-white">
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,#7c3aed44,transparent_30%),radial-gradient(circle_at_top_right,#ec489944,transparent_30%),radial-gradient(circle_at_bottom,#2563eb33,transparent_35%)]" />
-
+      <GradientBackground />
       <div className="mx-auto max-w-7xl px-6 py-6">
         <motion.nav
           initial={{ opacity: 0, y: -16 }}

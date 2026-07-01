@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import GradientBackground from "@/components/GradientBackground";
 
 const generationSteps = [
   "Reading screenplay structure",
@@ -59,8 +60,7 @@ export default function GeneratingPage() {
 
   return (
     <main className="min-h-screen bg-black text-white">
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,#7c3aed44,transparent_30%),radial-gradient(circle_at_top_right,#ec489944,transparent_30%),radial-gradient(circle_at_bottom,#2563eb33,transparent_35%)]" />
-
+      <GradientBackground />
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-6 py-6">
         <nav className="flex items-center justify-between border-b border-white/10 pb-6">
           <Link href="/" className="text-xl font-bold tracking-tight">
