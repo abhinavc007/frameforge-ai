@@ -37,6 +37,18 @@ type GeneratedProject = {
 const defaultNegativePrompt =
   "blurry, low quality, distorted face, bad anatomy, extra limbs, extra fingers, messy hands, unreadable text, watermark, logo, random letters, photorealistic, ugly composition, cropped subject";
 
+function getImagesStorageKey(projectTitle: string) {
+  const safeTitle =
+    projectTitle
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || "untitled-project";
+
+  return `frameforge-generated-images-${safeTitle}`;
+}
+
 const fallbackProject: GeneratedProject = {
   projectTitle: "The Last Lantern",
   style: "Cinematic anime",
@@ -89,7 +101,8 @@ const fallbackProject: GeneratedProject = {
         {
           shotNumber: 4,
           cameraAngle: "Final transition shot",
-          description: "Low-angle shot of the lantern flickering near the shrine.",
+          description:
+            "Low-angle shot of the lantern flickering near the shrine.",
           caption:
             "A distant lantern flickers near the abandoned shrine, pulling him forward.",
           visualPrompt:
@@ -119,6 +132,23 @@ export default function DemoProjectPage() {
     }
   }, []);
 
+  useEffect(() => {
+    const savedImages = sessionStorage.getItem(
+      getImagesStorageKey(project.projectTitle)
+    );
+
+    if (!savedImages) {
+      setGeneratedImages({});
+      return;
+    }
+
+    try {
+      setGeneratedImages(JSON.parse(savedImages));
+    } catch {
+      setGeneratedImages({});
+    }
+  }, [project.projectTitle]);
+
   async function generatePanelImage(sceneNumber: number, shot: Shot) {
     const panelKey = `${sceneNumber}-${shot.shotNumber}`;
 
@@ -130,11 +160,11 @@ export default function DemoProjectPage() {
         headers: {
           "Content-Type": "application/json",
         },
-       body: JSON.stringify({
-  visualPrompt: shot.visualPrompt,
-  negativePrompt: shot.negativePrompt || defaultNegativePrompt,
-  seed: sceneNumber * 1000 + shot.shotNumber,
-}),
+        body: JSON.stringify({
+          visualPrompt: shot.visualPrompt,
+          negativePrompt: shot.negativePrompt || defaultNegativePrompt,
+          seed: sceneNumber * 1000 + shot.shotNumber,
+        }),
       });
 
       if (!response.ok) {
@@ -143,10 +173,23 @@ export default function DemoProjectPage() {
 
       const data = await response.json();
 
-      setGeneratedImages((currentImages) => ({
-        ...currentImages,
-        [panelKey]: data.imageUrl,
-      }));
+      setGeneratedImages((currentImages) => {
+        const updatedImages = {
+          ...currentImages,
+          [panelKey]: data.imageUrl,
+        };
+
+        try {
+          sessionStorage.setItem(
+            getImagesStorageKey(project.projectTitle),
+            JSON.stringify(updatedImages)
+          );
+        } catch {
+          console.warn("Could not save generated images to sessionStorage.");
+        }
+
+        return updatedImages;
+      });
     } catch {
       alert("Failed to generate panel image. Please try again.");
     } finally {
@@ -200,7 +243,6 @@ export default function DemoProjectPage() {
             <div className={gridClass}>
               {storyboardPanels.map(({ sceneNumber, shot }, index) => {
                 const panelKey = `${sceneNumber}-${shot.shotNumber}`;
-               
                 const imageUrl = generatedImages[panelKey];
                 const isGenerating = generatingPanelKey === panelKey;
 
