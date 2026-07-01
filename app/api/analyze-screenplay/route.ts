@@ -26,39 +26,72 @@ function inferMood(text: string) {
     return "Mysterious, dark, suspenseful";
   }
 
+  if (lowerText.includes("forest") || lowerText.includes("spirit")) {
+    return "Mystical, quiet, fantasy-driven";
+  }
+
+  if (lowerText.includes("castle") || lowerText.includes("beast")) {
+    return "Epic, tense, dramatic";
+  }
+
   return "Cinematic, emotional, story-driven";
 }
 
-function createShotList(sceneSummary: string, style: string) {
+function getStoryBeats(sceneSummary: string) {
+  const sentences = sceneSummary
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+
+  return {
+    openingBeat: sentences[0] || sceneSummary,
+    actionBeat: sentences[1] || sentences[0] || sceneSummary,
+    detailBeat: sentences[2] || sentences[1] || sentences[0] || sceneSummary,
+    finalBeat:
+      sentences[sentences.length - 1] ||
+      sentences[2] ||
+      sentences[1] ||
+      sentences[0] ||
+      sceneSummary,
+  };
+}
+
+function createShotList(sceneSummary: string, style: string, mood: string) {
+  const beats = getStoryBeats(sceneSummary);
+
   return [
     {
       shotNumber: 1,
       cameraAngle: "Wide establishing shot",
-      description: `Introduce the environment and mood of the scene: ${sceneSummary}`,
-      visualPrompt: `${style} storyboard panel, wide establishing shot, cinematic composition, atmospheric background, strong mood lighting`,
+      description: `Establish the scene environment and atmosphere: ${beats.openingBeat}`,
+      visualPrompt: `${style} storyboard panel, wide establishing shot, ${beats.openingBeat}, ${mood}, cinematic composition, atmospheric background, strong lighting`,
     },
     {
       shotNumber: 2,
-      cameraAngle: "Medium character shot",
-      description:
-        "Show the main character inside the scene and establish their action.",
-      visualPrompt: `${style} storyboard panel, medium character shot, expressive pose, clear action, cinematic anime framing`,
+      cameraAngle: "Medium action shot",
+      description: `Show the main action or character movement: ${beats.actionBeat}`,
+      visualPrompt: `${style} storyboard panel, medium action shot, ${beats.actionBeat}, expressive character pose, anime-style cinematic framing`,
     },
     {
       shotNumber: 3,
-      cameraAngle: "Close-up emotional shot",
-      description:
-        "Focus on the character's emotion, reaction, or important detail.",
-      visualPrompt: `${style} storyboard panel, close-up shot, emotional expression, dramatic lighting, anime-style detail`,
+      cameraAngle: "Close-up detail shot",
+      description: `Focus on an important emotion, object, or visual detail: ${beats.detailBeat}`,
+      visualPrompt: `${style} storyboard panel, close-up detail shot, ${beats.detailBeat}, emotional focus, dramatic anime lighting`,
     },
     {
       shotNumber: 4,
       cameraAngle: "Final transition shot",
-      description:
-        "End the scene with a visual beat that leads into the next moment.",
-      visualPrompt: `${style} storyboard panel, transition shot, cinematic ending frame, strong visual atmosphere`,
+      description: `End the scene with a strong visual beat: ${beats.finalBeat}`,
+      visualPrompt: `${style} storyboard panel, final transition shot, ${beats.finalBeat}, cinematic ending frame, ${mood}, strong visual atmosphere`,
     },
   ];
+}
+
+function cleanSceneHeading(heading: string) {
+  return heading
+    .replace(/^(INT\.|EXT\.|INT\/EXT\.)\s*/i, "")
+    .replace(/^Scene\s+\d+\s*:?\s*/i, "")
+    .trim();
 }
 
 export async function POST(request: Request) {
@@ -78,23 +111,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const firstSceneHeadingMatch = screenplay.match(
-  /(?:^|\n)\s*(?:INT\.|EXT\.|INT\/EXT\.)\s/i
-);
+    const headingRegex =
+      /^\s*(?:(?:INT\.|EXT\.|INT\/EXT\.)\s+.+|Scene\s+\d+\s*:?\s*.+)$/gim;
 
-const screenplayForAnalysis =
-  firstSceneHeadingMatch?.index !== undefined
-    ? screenplay.slice(firstSceneHeadingMatch.index).trim()
-    : screenplay;
+    const headings = [...screenplay.matchAll(headingRegex)];
 
-const sceneBlocks = screenplayForAnalysis
-  .split(/(?=^\s*(?:INT\.|EXT\.|INT\/EXT\.)\s)/gim)
-  .map((scene) => scene.trim())
-  .filter(Boolean);
+    const blocks =
+      headings.length > 0
+        ? headings.map((match, index) => {
+            const start = match.index ?? 0;
+            const end = headings[index + 1]?.index ?? screenplay.length;
+            return screenplay.slice(start, end).trim();
+          })
+        : [screenplay.trim()];
 
-const blocks = sceneBlocks.length > 0 ? sceneBlocks : [screenplayForAnalysis];
-
-    const scenes = blocks.slice(0, 3).map((block, index) => {
+    const scenes = blocks.slice(0, 6).map((block, index) => {
       const lines = block
         .split("\n")
         .map((line) => line.trim())
@@ -103,25 +134,30 @@ const blocks = sceneBlocks.length > 0 ? sceneBlocks : [screenplayForAnalysis];
       const heading = lines[0] || `Scene ${index + 1}`;
       const description = lines.slice(1).join(" ") || block;
 
-      const cleanedHeading = heading
-        .replace(/^(INT\.|EXT\.|INT\/EXT\.)\s*/i, "")
-        .trim();
+      const cleanedHeading = cleanSceneHeading(heading);
 
       const [locationPart, timePart] = cleanedHeading.split(/\s+-\s+/);
+
+      const sceneTitle =
+        locationPart && locationPart.trim().length > 0
+          ? locationPart.trim()
+          : "Untitled Scene";
 
       const summary =
         description.length > 220
           ? `${description.slice(0, 220)}...`
           : description;
 
+      const mood = inferMood(`${heading} ${description}`);
+
       return {
         sceneNumber: index + 1,
-        title: `Scene ${index + 1} - ${locationPart || "Untitled Scene"}`,
-        location: locationPart || "Unspecified location",
+        title: `Scene ${index + 1} - ${sceneTitle}`,
+        location: sceneTitle,
         timeOfDay: timePart || "Unspecified time",
-        mood: inferMood(`${heading} ${description}`),
+        mood,
         summary,
-        shots: createShotList(summary, style),
+        shots: createShotList(summary, style, mood),
       };
     });
 
