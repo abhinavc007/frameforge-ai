@@ -121,6 +121,7 @@ export default function DemoProjectPage() {
     {}
   );
   const [generatingPanelKey, setGeneratingPanelKey] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const savedGeneratedProject = sessionStorage.getItem(
@@ -153,6 +154,7 @@ export default function DemoProjectPage() {
     const panelKey = `${sceneNumber}-${shot.shotNumber}`;
 
     try {
+      setErrorMessage("");
       setGeneratingPanelKey(panelKey);
 
       const response = await fetch("/api/generate-panel", {
@@ -191,7 +193,9 @@ export default function DemoProjectPage() {
         return updatedImages;
       });
     } catch {
-      alert("Failed to generate panel image. Please try again.");
+      setErrorMessage(
+        "Panel generation failed. Please check your connection and try again."
+      );
     } finally {
       setGeneratingPanelKey("");
     }
@@ -206,14 +210,14 @@ export default function DemoProjectPage() {
 
   const gridClass =
     storyboardPanels.length <= 2
-      ? "mx-auto grid max-w-4xl gap-8 md:grid-cols-2"
-      : "grid gap-8 md:grid-cols-2 xl:grid-cols-4";
+      ? "mx-auto grid max-w-5xl gap-6 md:grid-cols-2 md:gap-8"
+      : "grid gap-6 md:grid-cols-2 xl:grid-cols-4 md:gap-8";
 
   return (
     <main className="min-h-screen bg-black text-white">
       <GradientBackground />
 
-      <div className="mx-auto max-w-7xl px-6 py-6">
+      <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6">
         <AppNavbar
           secondaryHref="/dashboard"
           secondaryLabel="Dashboard"
@@ -221,25 +225,35 @@ export default function DemoProjectPage() {
           ctaLabel="New Project"
         />
 
-        <section className="py-12">
+        <section className="py-7 sm:py-12">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <p className="mx-auto mb-5 w-fit rounded-full border border-purple-400/20 bg-purple-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-purple-200/80">
+            <p className="mx-auto mb-5 w-fit rounded-full border border-purple-400/20 bg-purple-400/10 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-purple-200/80 sm:text-xs">
               Storyboard Preview
             </p>
 
-            <h1 className="text-5xl font-black tracking-tight md:text-7xl">
+            <h1 className="mx-auto max-w-5xl text-4xl font-black tracking-tight sm:text-5xl md:text-7xl">
               {project.projectTitle}
             </h1>
+
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-white/50 sm:text-base sm:leading-7">
+              Read each caption, then generate the panels you want to visualize.
+            </p>
+
+            {errorMessage ? (
+              <div className="mx-auto mt-6 max-w-2xl rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                {errorMessage}
+              </div>
+            ) : null}
           </motion.div>
         </section>
 
-        <section className="pb-24">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-5 shadow-2xl shadow-black/40 md:p-8">
+        <section className="pb-16 sm:pb-24">
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-3 shadow-2xl shadow-black/40 sm:rounded-[2rem] sm:p-5 md:p-8">
             <div className={gridClass}>
               {storyboardPanels.map(({ sceneNumber, shot }, index) => {
                 const panelKey = `${sceneNumber}-${shot.shotNumber}`;
@@ -253,10 +267,10 @@ export default function DemoProjectPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.2 }}
                     transition={{ duration: 0.5, delay: index * 0.04 }}
-                    className="rounded-[1.75rem] border border-white/10 bg-[#111111]/90 p-4 shadow-xl shadow-black/30"
+                    className="rounded-[1.5rem] border border-white/10 bg-[#111111]/90 p-3 shadow-xl shadow-black/30 sm:rounded-[1.75rem] sm:p-4"
                   >
-                    <div className="overflow-hidden rounded-[1.25rem] border border-white/15 bg-neutral-900">
-                      <div className="aspect-[4/3] bg-gradient-to-br from-purple-500/20 via-pink-500/10 to-blue-500/20">
+                    <div className="overflow-hidden rounded-[1.15rem] border border-white/15 bg-neutral-900 sm:rounded-[1.25rem]">
+                      <div className="aspect-[16/10] bg-gradient-to-br from-purple-500/20 via-pink-500/10 to-blue-500/20 sm:aspect-[4/3]">
                         {imageUrl ? (
                           <img
                             src={imageUrl}
@@ -265,17 +279,21 @@ export default function DemoProjectPage() {
                           />
                         ) : (
                           <div className="flex h-full items-center justify-center p-6 text-center">
-                            <p className="text-sm leading-6 text-white/45">
-                              Generate this panel to preview the storyboard
-                              image.
-                            </p>
+                            <div>
+                              <div className="mx-auto mb-4 h-10 w-10 rounded-full border border-white/10 bg-white/5" />
+                              <p className="text-sm leading-6 text-white/45">
+                                {isGenerating
+                                  ? "Generating storyboard image..."
+                                  : "Generate this panel to preview the storyboard image."}
+                              </p>
+                            </div>
                           </div>
                         )}
                       </div>
                     </div>
 
-                    <div className="mt-4 rounded-[1.15rem] border border-black/10 bg-[#f4efe3] p-4 text-black shadow-lg shadow-black/20">
-                      <p className="text-[15px] font-medium leading-7">
+                    <div className="mt-3 rounded-[1rem] border border-black/10 bg-[#f4efe3] p-4 text-black shadow-lg shadow-black/20 sm:mt-4 sm:rounded-[1.15rem]">
+                      <p className="text-[14px] font-medium leading-7 sm:text-[15px]">
                         {shot.caption || shot.description}
                       </p>
                     </div>
