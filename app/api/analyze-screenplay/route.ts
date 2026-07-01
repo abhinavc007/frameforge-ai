@@ -193,7 +193,6 @@ function getDynamicShotMoments(sceneDescription: string) {
     },
   ];
 }
-
 function getStylePhrase(style: string) {
   const lowerStyle = style.toLowerCase();
 
@@ -252,38 +251,83 @@ function inferCharacterType(sceneContext: string) {
   return "the main character";
 }
 
-function createSettingDetails(
+function createCharacterContinuity(
+  sceneContext: string,
+  characterNotes?: string
+) {
+  const mainCharacter = extractMainCharacter(sceneContext);
+  const characterType = inferCharacterType(sceneContext);
+
+  let visualIdentity = "simple consistent clothing and the same hairstyle";
+
+  if (characterType.includes("young boy")) {
+    visualIdentity =
+      "short black hair, expressive eyes, casual home clothes, simple T-shirt and shorts";
+  }
+
+  if (characterType.includes("young girl")) {
+    visualIdentity =
+      "neatly styled dark hair, expressive eyes, casual story-appropriate clothes";
+  }
+
+  if (characterType.includes("man")) {
+    visualIdentity =
+      "consistent hairstyle, simple story-appropriate clothes, same face in every panel";
+  }
+
+  if (characterType.includes("woman")) {
+    visualIdentity =
+      "consistent hairstyle, simple story-appropriate clothes, same face in every panel";
+  }
+
+  const notes = characterNotes
+    ? ` User character notes: ${trimText(characterNotes, 120)}.`
+    : "";
+
+  return `${mainCharacter} is ${characterType} with ${visualIdentity}. Keep this exact character appearance in every panel.${notes}`;
+}
+
+function createLocationContinuity(
   sceneContext: string,
   location: string,
   timeOfDay: string
 ) {
   const lowerContext = sceneContext.toLowerCase();
-  const details: string[] = [];
 
-  details.push(`location: ${location}`);
-  details.push(`time of day: ${timeOfDay}`);
-
-  if (lowerContext.includes("sunny") || lowerContext.includes("afternoon")) {
-    details.push("warm sunny afternoon lighting");
+  if (
+    lowerContext.includes("sitout") ||
+    lowerContext.includes("veranda") ||
+    lowerContext.includes("house")
+  ) {
+    return `Same house sitout/veranda in every panel: warm sunny afternoon light, simple homely house exterior, visible chair, visible doorway, kitchen doorway or entrance in the background, same wall color and same layout.`;
   }
 
-  if (lowerContext.includes("sitout") || lowerContext.includes("veranda")) {
-    details.push("house sitout or veranda clearly visible");
-  }
+  return `Same location in every panel: ${location}, ${timeOfDay}, consistent lighting, same environment, same major objects, same camera style.`;
+}
 
-  if (lowerContext.includes("house")) {
-    details.push("simple homely house exterior visible");
-  }
+function createSceneContinuityBlock({
+  sceneContext,
+  location,
+  timeOfDay,
+  characterNotes,
+}: {
+  sceneContext: string;
+  location: string;
+  timeOfDay: string;
+  characterNotes?: string;
+}) {
+  const characterContinuity = createCharacterContinuity(
+    sceneContext,
+    characterNotes
+  );
 
-  if (lowerContext.includes("chair")) {
-    details.push("chair clearly visible");
-  }
+  const locationContinuity = createLocationContinuity(
+    sceneContext,
+    location,
+    timeOfDay
+  );
 
-  if (lowerContext.includes("kitchen")) {
-    details.push("kitchen doorway or entrance visible in the background");
-  }
-
-  return details.join(", ");
+  return `Scene continuity: ${characterContinuity} Location continuity: ${locationContinuity}`;
 }
 
 function createVisibleAction(caption: string, sceneContext: string) {
@@ -296,15 +340,15 @@ function createVisibleAction(caption: string, sceneContext: string) {
     lowerCaption.includes("calls him") ||
     lowerCaption.includes("call him")
   ) {
-    return "Balan is still in the house sitout near the same chair, suddenly turning his head toward the kitchen doorway with a surprised and attentive expression. The kitchen doorway is visible in the background. Warm sunny afternoon light continues in the same house setting.";
+    return "Balan is still in the same house sitout near the same chair, suddenly turning his head toward the kitchen doorway with a surprised and attentive expression.";
   }
 
   if (lowerCaption.includes("sitting") || lowerCaption.includes("chair")) {
-    return "Balan is sitting naturally on a chair in the house sitout, relaxed and calm, during a warm sunny afternoon.";
+    return "Balan is sitting naturally on the same chair in the house sitout, relaxed and calm, during a warm sunny afternoon.";
   }
 
   if (lowerContext.includes("sitout") && lowerContext.includes("kitchen")) {
-    return `${caption} Show the house sitout clearly, with the kitchen doorway direction visible.`;
+    return `${caption} Show the same house sitout clearly, with the kitchen doorway direction visible.`;
   }
 
   return caption;
@@ -327,18 +371,18 @@ function createVisualPrompt({
   mood: string;
   characterNotes?: string;
 }) {
-  const mainCharacter = extractMainCharacter(sceneContext);
-  const characterType = inferCharacterType(sceneContext);
-  const settingDetails = createSettingDetails(sceneContext, location, timeOfDay);
-  const visibleAction = createVisibleAction(caption, sceneContext);
+  const sceneContinuity = createSceneContinuityBlock({
+    sceneContext,
+    location,
+    timeOfDay,
+    characterNotes,
+  });
 
-  const notes = characterNotes
-    ? ` Character notes: ${trimText(characterNotes, 120)}.`
-    : "";
+  const visibleAction = createVisibleAction(caption, sceneContext);
 
   return `${getStylePhrase(
     style
-  )}. Draw one clear storyboard panel. Main character: ${mainCharacter}, ${characterType}. Setting: ${settingDetails}. Moment: ${visibleAction} Keep character, chair, house sitout, kitchen direction, lighting, and location consistent. Mood: ${mood}.${notes} Clean anime linework, cinematic framing, natural lighting, no text, no watermark.`;
+  )}. Draw one clear storyboard panel. ${sceneContinuity} Shot moment: ${visibleAction} Mood: ${mood}. Clean anime linework, cinematic framing, natural lighting, professional storyboard composition, no text, no watermark.`;
 }
 function createNegativePrompt() {
   return "blurry, low quality, distorted face, bad anatomy, extra limbs, extra fingers, messy hands, unreadable text, watermark, logo, random letters, photorealistic, wrong character, wrong location, unrelated scenery, unrelated objects, ugly composition, cropped subject";

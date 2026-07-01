@@ -5,6 +5,7 @@ export const runtime = "nodejs";
 type GeneratePanelRequest = {
   visualPrompt?: string;
   negativePrompt?: string;
+  seed?: number;
 };
 
 export async function POST(request: Request) {
@@ -13,6 +14,11 @@ export async function POST(request: Request) {
 
     const visualPrompt = body.visualPrompt?.trim();
     const negativePrompt = body.negativePrompt?.trim();
+
+    const seed =
+      typeof body.seed === "number" && Number.isFinite(body.seed)
+        ? body.seed
+        : Date.now();
 
     if (!visualPrompt || visualPrompt.length < 10) {
       return NextResponse.json(
@@ -36,12 +42,13 @@ export async function POST(request: Request) {
 
     const encodedPrompt = encodeURIComponent(finalPrompt);
 
-    const pollinationsUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?model=flux&width=1024&height=768&nologo=true&safe=true`;
+    const pollinationsUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?model=flux&width=1024&height=768&nologo=true&safe=true&seed=${seed}`;
 
     const imageResponse = await fetch(pollinationsUrl, {
       headers: {
         Authorization: `Bearer ${apiKey}`,
       },
+      cache: "no-store",
     });
 
     if (!imageResponse.ok) {
@@ -64,6 +71,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       imageUrl: `data:${contentType};base64,${base64Image}`,
+      seed,
     });
   } catch {
     return NextResponse.json(

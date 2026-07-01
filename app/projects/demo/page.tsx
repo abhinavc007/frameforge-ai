@@ -130,10 +130,11 @@ export default function DemoProjectPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          visualPrompt: shot.visualPrompt,
-          negativePrompt: shot.negativePrompt || defaultNegativePrompt,
-        }),
+       body: JSON.stringify({
+  visualPrompt: shot.visualPrompt,
+  negativePrompt: shot.negativePrompt || defaultNegativePrompt,
+  seed: sceneNumber * 1000 + shot.shotNumber,
+}),
       });
 
       if (!response.ok) {
@@ -199,6 +200,7 @@ export default function DemoProjectPage() {
             <div className={gridClass}>
               {storyboardPanels.map(({ sceneNumber, shot }, index) => {
                 const panelKey = `${sceneNumber}-${shot.shotNumber}`;
+               
                 const imageUrl = generatedImages[panelKey];
                 const isGenerating = generatingPanelKey === panelKey;
 
