@@ -1,16 +1,16 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import GradientBackground from "@/components/GradientBackground";
 import AppNavbar from "@/components/AppNavbar";
+import GradientBackground from "@/components/GradientBackground";
 
 const generationSteps = [
   "Reading screenplay structure",
   "Extracting scenes and mood",
   "Generating cinematic shots",
-  "Creating anime-style storyboard plan",
+  "Creating visual prompts",
   "Preparing storyboard preview",
 ];
 
@@ -24,36 +24,73 @@ type ProjectDraft = {
 
 export default function GeneratingPage() {
   const router = useRouter();
+  const hasStarted = useRef(false);
+
   const [currentStep, setCurrentStep] = useState(0);
   const [projectDraft, setProjectDraft] = useState<ProjectDraft | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const savedProject = sessionStorage.getItem("frameforge-current-project");
+    if (hasStarted.current) return;
+    hasStarted.current = true;
 
-    if (savedProject) {
-      setProjectDraft(JSON.parse(savedProject));
-    }
-  }, []);
+    const generateStoryboard = async () => {
+      try {
+        const savedProject = sessionStorage.getItem(
+          "frameforge-current-project"
+        );
 
-  useEffect(() => {
-    const stepTimer = setInterval(() => {
-      setCurrentStep((previousStep) => {
-        if (previousStep < generationSteps.length - 1) {
-          return previousStep + 1;
+        if (!savedProject) {
+          router.push("/projects/new");
+          return;
         }
 
-        return previousStep;
-      });
-    }, 900);
+        const draft = JSON.parse(savedProject) as ProjectDraft;
+        setProjectDraft(draft);
 
-    const redirectTimer = setTimeout(() => {
-      router.push("/projects/demo");
-    }, 5200);
+        const stepTimer = setInterval(() => {
+          setCurrentStep((previousStep) => {
+            if (previousStep < generationSteps.length - 1) {
+              return previousStep + 1;
+            }
 
-    return () => {
-      clearInterval(stepTimer);
-      clearTimeout(redirectTimer);
+            return previousStep;
+          });
+        }, 700);
+
+        const response = await fetch("/api/analyze-screenplay", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(draft),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to analyze screenplay.");
+        }
+
+        const generatedProject = await response.json();
+
+        sessionStorage.setItem(
+          "frameforge-generated-project",
+          JSON.stringify(generatedProject)
+        );
+
+        clearInterval(stepTimer);
+        setCurrentStep(generationSteps.length - 1);
+
+        setTimeout(() => {
+          router.push("/projects/demo");
+        }, 900);
+      } catch {
+        setError(
+          "Something went wrong while generating the storyboard. Please try again."
+        );
+      }
     };
+
+    generateStoryboard();
   }, [router]);
 
   const progress = ((currentStep + 1) / generationSteps.length) * 100;
@@ -61,11 +98,9 @@ export default function GeneratingPage() {
   return (
     <main className="min-h-screen bg-black text-white">
       <GradientBackground />
+
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-6 py-6">
-        <AppNavbar
-  secondaryHref="/dashboard"
-  secondaryLabel="Dashboard"
-/>
+        <AppNavbar secondaryHref="/dashboard" secondaryLabel="Dashboard" />
 
         <section className="flex flex-1 items-center justify-center py-16">
           <motion.div
@@ -96,14 +131,14 @@ export default function GeneratingPage() {
 
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/60">
               {projectDraft?.title
-                ? `FrameForge AI is preparing "${projectDraft.title}" for storyboard generation.`
+                ? `FrameForge AI is analyzing "${projectDraft.title}" and building a storyboard structure.`
                 : "FrameForge AI is preparing your screenplay for storyboard generation."}
             </p>
 
             <div className="mt-10 rounded-2xl border border-white/10 bg-black/35 p-5 text-left">
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-sm font-medium text-white/70">
-                  {generationSteps[currentStep]}
+                  {error || generationSteps[currentStep]}
                 </p>
                 <p className="text-sm text-white/40">{Math.round(progress)}%</p>
               </div>
@@ -113,7 +148,11 @@ export default function GeneratingPage() {
                   initial={{ width: "0%" }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
+                  className={`h-full rounded-full ${
+                    error
+                      ? "bg-red-400"
+                      : "bg-gradient-to-r from-purple-500 to-pink-500"
+                  }`}
                 />
               </div>
             </div>
@@ -138,10 +177,18 @@ export default function GeneratingPage() {
               ))}
             </div>
 
-            <p className="mt-8 text-sm text-white/40">
-              This is a simulated generation flow for v1. Real AI processing
-              will be connected later.
-            </p>
+            {error ? (
+              <button
+                onClick={() => router.push("/projects/new")}
+                className="mt-8 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/90"
+              >
+                Back to Project Form
+              </button>
+            ) : (
+              <p className="mt-8 text-sm text-white/40">
+                Analyzing screenplay, scenes, shots, and visual prompts.
+              </p>
+            )}
           </motion.div>
         </section>
       </div>

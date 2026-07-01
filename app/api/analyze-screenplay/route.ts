@@ -78,12 +78,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const sceneBlocks = screenplay
-      .split(/(?=(?:INT\.|EXT\.|INT\/EXT\.)\s)/gi)
-      .map((scene) => scene.trim())
-      .filter(Boolean);
+    const firstSceneHeadingMatch = screenplay.match(
+  /(?:^|\n)\s*(?:INT\.|EXT\.|INT\/EXT\.)\s/i
+);
 
-    const blocks = sceneBlocks.length > 0 ? sceneBlocks : [screenplay];
+const screenplayForAnalysis =
+  firstSceneHeadingMatch?.index !== undefined
+    ? screenplay.slice(firstSceneHeadingMatch.index).trim()
+    : screenplay;
+
+const sceneBlocks = screenplayForAnalysis
+  .split(/(?=^\s*(?:INT\.|EXT\.|INT\/EXT\.)\s)/gim)
+  .map((scene) => scene.trim())
+  .filter(Boolean);
+
+const blocks = sceneBlocks.length > 0 ? sceneBlocks : [screenplayForAnalysis];
 
     const scenes = blocks.slice(0, 3).map((block, index) => {
       const lines = block

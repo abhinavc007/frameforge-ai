@@ -1,71 +1,109 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import GradientBackground from "@/components/GradientBackground";
+import { motion } from "framer-motion";
 import AppNavbar from "@/components/AppNavbar";
+import GradientBackground from "@/components/GradientBackground";
 
-type ProjectDraft = {
-  title: string;
-  screenplay: string;
-  style: string;
-  characterNotes: string;
-  createdAt: string;
+type Shot = {
+  shotNumber: number;
+  cameraAngle: string;
+  description: string;
+  visualPrompt: string;
 };
 
-const scenes = [
-  {
-    title: "Scene 1 — Rainy Village Road",
-    location: "Village road",
-    mood: "Lonely, dramatic, mysterious",
-    summary:
-      "A young boy walks alone through heavy rain while a distant lantern flickers near an abandoned shrine.",
-    shots: [
-      "Wide shot of the empty rainy village road.",
-      "Medium shot of the boy walking under a broken umbrella.",
-      "Close-up of the boy’s tired eyes as thunder flashes.",
-      "Low-angle shot of the lantern flickering near the shrine.",
-    ],
-  },
-  {
-    title: "Scene 2 — Abandoned Shrine",
-    location: "Old shrine",
-    mood: "Suspenseful, spiritual, cinematic",
-    summary:
-      "The boy approaches the shrine and notices the lantern glowing brighter as if reacting to his presence.",
-    shots: [
-      "Establishing shot of the shrine hidden behind rain and mist.",
-      "Over-the-shoulder shot of the boy looking at the lantern.",
-      "Close-up of the lantern flame turning blue.",
-      "Wide shot of shadows moving behind the shrine gate.",
-    ],
-  },
-];
+type Scene = {
+  sceneNumber: number;
+  title: string;
+  location: string;
+  timeOfDay: string;
+  mood: string;
+  summary: string;
+  shots: Shot[];
+};
+
+type GeneratedProject = {
+  projectTitle: string;
+  style: string;
+  sceneCount: number;
+  shotCount: number;
+  panelCount: number;
+  scenes: Scene[];
+};
+
+const fallbackProject: GeneratedProject = {
+  projectTitle: "The Last Lantern",
+  style: "Cinematic anime",
+  sceneCount: 1,
+  shotCount: 4,
+  panelCount: 4,
+  scenes: [
+    {
+      sceneNumber: 1,
+      title: "Scene 1 - Rainy Village Road",
+      location: "Village road",
+      timeOfDay: "Night",
+      mood: "Lonely, dramatic, mysterious",
+      summary:
+        "A young boy walks alone through heavy rain while a distant lantern flickers near an abandoned shrine.",
+      shots: [
+        {
+          shotNumber: 1,
+          cameraAngle: "Wide establishing shot",
+          description: "Wide shot of the empty rainy village road.",
+          visualPrompt:
+            "Cinematic anime storyboard panel, rainy village road, dramatic lighting.",
+        },
+        {
+          shotNumber: 2,
+          cameraAngle: "Medium character shot",
+          description: "Medium shot of the boy walking under a broken umbrella.",
+          visualPrompt:
+            "Cinematic anime storyboard panel, boy under umbrella, rainy atmosphere.",
+        },
+        {
+          shotNumber: 3,
+          cameraAngle: "Close-up emotional shot",
+          description: "Close-up of the boy’s tired eyes as thunder flashes.",
+          visualPrompt:
+            "Cinematic anime storyboard panel, close-up emotional face, thunder light.",
+        },
+        {
+          shotNumber: 4,
+          cameraAngle: "Final transition shot",
+          description: "Low-angle shot of the lantern flickering near the shrine.",
+          visualPrompt:
+            "Cinematic anime storyboard panel, glowing lantern near old shrine.",
+        },
+      ],
+    },
+  ],
+};
 
 export default function DemoProjectPage() {
-  const [projectDraft, setProjectDraft] = useState<ProjectDraft | null>(null);
+  const [project, setProject] = useState<GeneratedProject>(fallbackProject);
 
-useEffect(() => {
-  const savedProject = sessionStorage.getItem("frameforge-current-project");
+  useEffect(() => {
+    const savedGeneratedProject = sessionStorage.getItem(
+      "frameforge-generated-project"
+    );
 
-  if (savedProject) {
-    setProjectDraft(JSON.parse(savedProject));
-  }
-}, []);
+    if (savedGeneratedProject) {
+      setProject(JSON.parse(savedGeneratedProject));
+    }
+  }, []);
 
-const projectTitle = projectDraft?.title || "The Last Lantern";
-const projectStyle = projectDraft?.style || "Cinematic anime";
-    
   return (
     <main className="min-h-screen bg-black text-white">
       <GradientBackground />
+
       <div className="mx-auto max-w-7xl px-6 py-6">
         <AppNavbar
-  secondaryHref="/dashboard"
-  secondaryLabel="Dashboard"
-  ctaHref="/projects/new"
-  ctaLabel="New Project"
-/>
+          secondaryHref="/dashboard"
+          secondaryLabel="Dashboard"
+          ctaHref="/projects/new"
+          ctaLabel="New Project"
+        />
 
         <section className="py-12">
           <motion.div
@@ -78,20 +116,20 @@ const projectStyle = projectDraft?.style || "Cinematic anime";
             </p>
 
             <h1 className="max-w-4xl text-4xl font-black tracking-tight md:text-5xl">
-              {projectTitle}
+              {project.projectTitle}
             </h1>
 
             <p className="mt-5 max-w-2xl text-lg leading-8 text-white/60">
-              AI-generated scene breakdown, cinematic shot list, and {projectStyle.toLowerCase()}
-              storyboard panel preview.
+              AI-generated scene breakdown, cinematic shot list, and{" "}
+              {project.style.toLowerCase()} storyboard panel preview.
             </p>
           </motion.div>
 
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {[
-              { label: "Scenes", value: "2" },
-              { label: "Shots", value: "8" },
-              { label: "Panels", value: "8" },
+              { label: "Scenes", value: project.sceneCount },
+              { label: "Shots", value: project.shotCount },
+              { label: "Panels", value: project.panelCount },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -105,9 +143,9 @@ const projectStyle = projectDraft?.style || "Cinematic anime";
         </section>
 
         <section className="space-y-8 pb-20">
-          {scenes.map((scene, sceneIndex) => (
+          {project.scenes.map((scene) => (
             <motion.article
-              key={scene.title}
+              key={`${scene.sceneNumber}-${scene.title}`}
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
@@ -116,31 +154,46 @@ const projectStyle = projectDraft?.style || "Cinematic anime";
             >
               <div className="mb-8">
                 <p className="mb-3 text-sm text-purple-300">
-                  {scene.location} • {scene.mood}
+                  {scene.location} • {scene.timeOfDay} • {scene.mood}
                 </p>
+
                 <h2 className="text-2xl font-bold">{scene.title}</h2>
+
                 <p className="mt-4 max-w-3xl leading-7 text-white/55">
                   {scene.summary}
                 </p>
               </div>
 
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-                {scene.shots.map((shot, shotIndex) => (
+                {scene.shots.map((shot) => (
                   <div
-                    key={shot}
+                    key={`${scene.sceneNumber}-${shot.shotNumber}`}
                     className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.03] p-4"
                   >
                     <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-purple-500/20 via-pink-500/10 to-blue-500/20 p-4">
                       <div className="flex h-full items-end rounded-xl bg-black/25 p-3">
                         <p className="text-xs text-white/45">
-                          Panel {sceneIndex + 1}.{shotIndex + 1}
+                          Panel {scene.sceneNumber}.{shot.shotNumber}
                         </p>
                       </div>
                     </div>
 
-                    <p className="mt-4 text-sm leading-6 text-white/65">
-                      {shot}
+                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-purple-300/80">
+                      {shot.cameraAngle}
                     </p>
+
+                    <p className="mt-3 text-sm leading-6 text-white/65">
+                      {shot.description}
+                    </p>
+
+                    <div className="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/35">
+                        Visual Prompt
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-white/45">
+                        {shot.visualPrompt}
+                      </p>
+                    </div>
 
                     <button className="mt-5 w-full rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white/70 transition hover:text-white">
                       Regenerate Panel
