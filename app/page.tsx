@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 export default function Home() {
@@ -61,9 +62,9 @@ export default function Home() {
               <button className="hidden rounded-full border border-white/15 px-5 py-2 text-sm text-white/80 sm:block">
                 Sign In
               </button>
-              <button className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black">
-                Start Creating
-              </button>
+              <Link href="/dashboard" className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black">
+                 Start Creating
+              </Link>
             </div>
           </motion.nav>
 
@@ -106,9 +107,10 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.44, ease: [0.22, 1, 0.36, 1] }}
                 className="mt-9 flex flex-col gap-4 sm:flex-row"
               >
-                <button className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 font-semibold transition-transform duration-300 hover:scale-[1.03]">
-                  Start Creating
-                </button>
+                <Link
+                href="/dashboard" className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-10 py-4 text-center text-lg font-semibold transition-transform duration-300 hover:scale-[1.05]">
+                Start Creating
+                </Link>
                 <button className="rounded-full border border-white/15 px-8 py-4 font-semibold text-white/80 transition-transform duration-300 hover:scale-[1.03]">
                   View Demo
                 </button>
@@ -311,9 +313,9 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ delay: 0.3, duration: 0.6 }}
             >
-              <button className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-10 py-4 text-lg font-semibold transition-transform duration-300 hover:scale-[1.05]">
+              <Link href="/dashboard" className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-10 py-4 text-lg font-semibold transition-transform duration-300 hover:scale-[1.05]">
                 Start Creating
-              </button>
+              </Link>
             </motion.div>
           </div>
         </motion.div>

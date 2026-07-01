@@ -88,9 +88,12 @@ export default function DashboardPage() {
             >
               Home
             </Link>
-            <button className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition hover:bg-white/90">
-              New Project
-            </button>
+            <Link
+  href="/projects/new"
+  className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition hover:bg-white/90"
+>
+  New Project
+</Link>
           </div>
         </motion.nav>
 
@@ -116,9 +119,12 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <button className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 font-semibold transition-transform duration-300 hover:scale-[1.03]">
-              Create New Project
-            </button>
+            <Link
+  href="/projects/new"
+  className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 text-center font-semibold transition-transform duration-300 hover:scale-[1.03]"
+>
+  Create New Project
+</Link>
           </motion.div>
 
           <motion.div
